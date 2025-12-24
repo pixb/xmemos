@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.1
   uni_links: ^0.5.1
   flutter_markdown: ^0.6.14 # 用于渲染 Markdown 组件
+  fl_chart: ^0.65.0 # 用于图表展示
 
 dev_dependencies:
   flutter_test:
