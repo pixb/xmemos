@@ -156,36 +156,62 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // PV, SP, OUT Parameters
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            for (var param in _sensorDetail.parameters)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        color: param.color,
-                                        size: 14,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(param.name, style: const TextStyle(fontSize: 14)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    param.value.toString(),
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: param.color,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                for (var param in _sensorDetail.parameters)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 24),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 12,
+                                              height: 12,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: param.color,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(param.name, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          param.value.toStringAsFixed(1),
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: param.color,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            // Tab indicators
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                for (var i = 0; i < _sensorDetail.parameters.length; i++)
+                                  Container(
+                                    width: 80,
+                                    height: 4,
+                                    margin: const EdgeInsets.only(right: 16),
+                                    color: i == 0 ? Colors.blue : Colors.grey[200],
+                                  ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -199,31 +225,7 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  // Progress Bars
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      for (var param in _sensorDetail.parameters)
-                        Expanded(
-                          child: Container(
-                            height: 4,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: FractionallySizedBox(
-                              widthFactor: param.type == SensorParameterType.out ? param.value / 100 : param.value / 200,
-                              child: Container(
-                                color: param.color,
-                                height: 4,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+
                 ],
               ),
             ),
