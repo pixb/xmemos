@@ -1,6 +1,6 @@
 # xmemos
 
-A new Flutter project.
+A new Flutter project of memos.
 
 ## Getting Started
 
