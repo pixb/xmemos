@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import '../models/sensor_detail.dart';
 
@@ -19,6 +20,42 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
   @override
   void initState() {
     super.initState();
+    // Generate 24 hours of minute-by-minute data (1440 points)
+    final List<double> pvData = [];
+    final List<double> spData = [];
+    final List<double> outData = [];
+    
+    // Base values
+    double pvBase = 101.0;
+    double spBase = 114.0;
+    double outBase = 71.0;
+    
+    final random = Random();
+    
+    for (int i = 0; i < 1440; i++) {
+      // PV: Fluctuate around 100-105
+      double pvVariation = (random.nextDouble() - 0.5) * 2.0; // -1.0 to 1.0
+      pvBase += pvVariation;
+      // Keep within reasonable range
+      if (pvBase < 95.0) pvBase = 95.0;
+      if (pvBase > 110.0) pvBase = 110.0;
+      pvData.add(double.parse(pvBase.toStringAsFixed(1)));
+      
+      // SP: More stable, minor adjustments
+      double spVariation = (random.nextDouble() - 0.5) * 0.5; // -0.25 to 0.25
+      spBase += spVariation;
+      if (spBase < 112.0) spBase = 112.0;
+      if (spBase > 116.0) spBase = 116.0;
+      spData.add(double.parse(spBase.toStringAsFixed(1)));
+      
+      // OUT: Fluctuate around 70-75, somewhat correlated to PV
+      double outVariation = (random.nextDouble() - 0.5) * 1.5 + pvVariation * 0.3;
+      outBase += outVariation;
+      if (outBase < 65.0) outBase = 65.0;
+      if (outBase > 80.0) outBase = 80.0;
+      outData.add(double.parse(outBase.toStringAsFixed(1)));
+    }
+    
     // Mock data for sensor detail
     _sensorDetail = SensorDetail(
       id: widget.sensorId,
@@ -48,9 +85,9 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
       ],
       pvScale: '0 - 200 psig',
       chartData: {
-        SensorParameterType.pv: [105.0, 102.0, 104.0, 101.0, 103.0, 100.0, 102.0, 101.0, 104.0, 102.0, 103.0, 101.0],
-        SensorParameterType.sp: [110.0, 112.0, 114.0, 113.0, 115.0, 114.0, 113.0, 114.0, 115.0, 113.0, 114.0, 114.0],
-        SensorParameterType.out: [70.0, 72.0, 73.0, 71.0, 72.0, 70.0, 71.0, 71.0, 73.0, 72.0, 71.0, 71.0],
+        SensorParameterType.pv: pvData,
+        SensorParameterType.sp: spData,
+        SensorParameterType.out: outData,
       },
       conditions: ['Abnormal Mode'],
     );
@@ -77,29 +114,32 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
             Container(
               padding: const EdgeInsets.all(16.0),
               color: Colors.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _sensorDetail.description,
-                    style: const TextStyle(fontSize: 16, color: Colors.black54),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _sensorDetail.description,
+                        style: const TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.sensorId,
+                        style: const TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'DeltaV System : ${_sensorDetail.deltaVSystem}',
+                        style: const TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
+                  // CAS/AUTO label
                   Text(
-                    widget.sensorId,
-                    style: const TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'DeltaV System : ${_sensorDetail.deltaVSystem}',
-                    style: const TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      _sensorDetail.casAuto,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    _sensorDetail.casAuto,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -113,34 +153,45 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (var param in _sensorDetail.parameters)
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                      // PV, SP, OUT Parameters
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            for (var param in _sensorDetail.parameters)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.circle,
-                                    color: param.color,
-                                    size: 14,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.circle,
+                                        color: param.color,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(param.name, style: const TextStyle(fontSize: 14)),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(param.name, style: const TextStyle(fontSize: 14)),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    param.value.toString(),
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: param.color,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                param.value.toString(),
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
+                      ),
                       // PV Scale
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           const Text('PV Scale', style: TextStyle(fontSize: 12, color: Colors.black54)),
                           Text(_sensorDetail.pvScale, style: const TextStyle(fontSize: 14)),
@@ -185,28 +236,38 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  for (var range in TimeRange.values)
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTimeRange = range;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _selectedTimeRange == range ? Colors.blue : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Text(
-                          range.label,
-                          style: TextStyle(
-                            color: _selectedTimeRange == range ? Colors.white : Colors.black,
-                            fontSize: 14,
+                  // Time Range Tabs
+                  Row(
+                    children: [
+                      for (var range in TimeRange.values)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedTimeRange = range;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _selectedTimeRange == range ? Colors.grey[300] : Colors.white,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: _selectedTimeRange == range ? Colors.black : Colors.transparent,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              range.label,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                    ],
+                  ),
                   // Settings Icon
                   const Icon(Icons.settings, color: Colors.grey),
                 ],
@@ -290,8 +351,9 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
           return FlSpot(e.key.toDouble(), e.value);
         }).toList(),
         isCurved: true,
+        curveSmoothness: 0.2,
         color: color,
-        barWidth: 2,
+        barWidth: 1.5,
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
       ));
@@ -307,17 +369,21 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 20,
+                reservedSize: 25,
+                interval: 120, // Show a label every 120 minutes (2 hours)
                 getTitlesWidget: (value, meta) {
-                  // Generate time labels
-                  final hour = 10 + (value.toInt() / 6).floor();
-                  final minute = (value.toInt() % 6) * 10;
-                  return Text('$hour:$minute'.padLeft(5, '0'));
+                  // Generate time labels for 24 hours
+                  final hour = (value.toInt() / 60).floor(); // Convert minutes to hours
+                  return Text('$hour:00', style: const TextStyle(fontSize: 10));
                 },
               ),
             ),
             leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                interval: 10, // Show a label every 10 units
+              ),
             ),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -327,7 +393,8 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
           minX: 0,
           maxX: (lines.first.spots.length - 1).toDouble(),
           minY: 60,
-          maxY: 180,
+          maxY: 120,
+          clipData: const FlClipData.all(),
         ),
       ),
     );
