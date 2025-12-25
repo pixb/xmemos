@@ -52,7 +52,8 @@ class SensorDetail {
   final String deltaVSystem;
   final String casAuto;
   final List<SensorParameter> parameters;
-  final String pvScale;
+  final String pvScaleRange;
+  final String pvScaleUnit;
   final Map<SensorParameterType, List<double>> chartData;
   final List<String> conditions;
 
@@ -63,7 +64,8 @@ class SensorDetail {
     required this.deltaVSystem,
     required this.casAuto,
     required this.parameters,
-    required this.pvScale,
+    required this.pvScaleRange,
+    required this.pvScaleUnit,
     required this.chartData,
     required this.conditions,
   });

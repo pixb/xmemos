@@ -83,7 +83,8 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
           type: SensorParameterType.out,
         ),
       ],
-      pvScale: '0 - 200 psig',
+      pvScaleRange: '0 - 200',
+      pvScaleUnit: 'psig',
       chartData: {
         SensorParameterType.pv: pvData,
         SensorParameterType.sp: spData,
@@ -220,7 +221,13 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           const Text('PV Scale', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                          Text(_sensorDetail.pvScale, style: const TextStyle(fontSize: 14)),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(_sensorDetail.pvScaleRange, style: const TextStyle(fontSize: 14)),
+                              Text(_sensorDetail.pvScaleUnit, style: const TextStyle(fontSize: 14)),
+                            ],
+                          ),
                         ],
                       ),
                     ],
