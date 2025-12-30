@@ -346,8 +346,34 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
 
   Widget _buildChart() {
     final List<LineChartBarData> lines = [];
-
-    // Create line for each parameter type
+    
+    // Get current time and calculate time range based on selected time range
+    final now = DateTime.now();
+    int rangeMinutes = 0;
+    
+    switch (_selectedTimeRange) {
+      case TimeRange.oneHour:
+        rangeMinutes = 60;
+        break;
+      case TimeRange.twoHours:
+        rangeMinutes = 120;
+        break;
+      case TimeRange.sixHours:
+        rangeMinutes = 360;
+        break;
+      case TimeRange.twelveHours:
+        rangeMinutes = 720;
+        break;
+      case TimeRange.twentyFourHours:
+        rangeMinutes = 1440;
+        break;
+    }
+    
+    // Calculate start index and end index for the chart data
+    final endIndex = _sensorDetail.chartData.values.first.length - 1;
+    final startIndex = endIndex - rangeMinutes + 1;
+    
+    // Create line for each parameter type with filtered data
     for (var entry in _sensorDetail.chartData.entries) {
       final color = entry.key == SensorParameterType.pv 
           ? Colors.blue 
@@ -355,8 +381,14 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
               ? Colors.green 
               : Colors.black;
 
+      // Filter data points based on selected time range
+      final filteredData = entry.value.sublist(
+        startIndex >= 0 ? startIndex : 0,
+        endIndex + 1
+      );
+
       lines.add(LineChartBarData(
-        spots: entry.value.asMap().entries.map((e) {
+        spots: filteredData.asMap().entries.map((e) {
           return FlSpot(e.key.toDouble(), e.value);
         }).toList(),
         isCurved: true,
@@ -366,6 +398,26 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
         dotData: const FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
       ));
+    }
+    
+    // Calculate interval based on time range
+    double interval = 0;
+    switch (_selectedTimeRange) {
+      case TimeRange.oneHour:
+        interval = 10; // Every 10 minutes
+        break;
+      case TimeRange.twoHours:
+        interval = 20; // Every 20 minutes
+        break;
+      case TimeRange.sixHours:
+        interval = 60; // Every 1 hour
+        break;
+      case TimeRange.twelveHours:
+        interval = 120; // Every 2 hours
+        break;
+      case TimeRange.twentyFourHours:
+        interval = 240; // Every 4 hours
+        break;
     }
 
     return SizedBox(
@@ -379,11 +431,15 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 25,
-                interval: 120, // Show a label every 120 minutes (2 hours)
+                interval: interval,
                 getTitlesWidget: (value, meta) {
-                  // Generate time labels for 24 hours
-                  final hour = (value.toInt() / 60).floor(); // Convert minutes to hours
-                  return Text('$hour:00', style: const TextStyle(fontSize: 10));
+                  // Calculate time based on current time and value
+                  final minutesToSubtract = rangeMinutes - value.toInt();
+                  final time = now.subtract(Duration(minutes: minutesToSubtract));
+                  return Text(
+                    '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(fontSize: 10),
+                  );
                 },
               ),
             ),
