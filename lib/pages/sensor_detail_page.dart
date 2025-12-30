@@ -16,6 +16,7 @@ class SensorDetailPage extends StatefulWidget {
 class _SensorDetailPageState extends State<SensorDetailPage> {
   TimeRange _selectedTimeRange = TimeRange.oneHour;
   late SensorDetail _sensorDetail;
+  double? _touchedX; // Track the touched X position on the chart
 
   @override
   void initState() {
@@ -460,6 +461,57 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
           minY: 60,
           maxY: 120,
           clipData: const FlClipData.all(),
+          lineTouchData: LineTouchData(
+            handleBuiltInTouches: true,
+            touchTooltipData: LineTouchTooltipData(
+              tooltipBgColor: Colors.white.withOpacity(0.9),
+              tooltipBorder: BorderSide(color: Colors.grey, width: 1),
+              getTooltipItems: (List<LineBarSpot> spots) {
+                if (spots.isEmpty) {
+                  return [];
+                }
+                
+                return spots.map((spot) {
+                  // Calculate touched time based on current time and selected range
+                  final minutesToSubtract = rangeMinutes - spot.x.toInt();
+                  final touchedTime = now.subtract(Duration(minutes: minutesToSubtract.toInt()));
+                  
+                  return LineTooltipItem(
+                    '${spot.y.toStringAsFixed(1)}\n',
+                    TextStyle(color: spot.bar.color, fontWeight: FontWeight.bold),
+                    children: [
+                      TextSpan(
+                        text: '${touchedTime.hour.toString().padLeft(2, '0')}:${touchedTime.minute.toString().padLeft(2, '0')}',
+                        style: const TextStyle(color: Colors.grey, fontSize: 10),
+                      ),
+                    ],
+                  );
+                }).toList();
+              },
+            ),
+            touchCallback: (event, response) {
+              if (event.isInterestedForInteractions && response != null && response.lineBarSpots != null && response.lineBarSpots!.isNotEmpty) {
+                final touchedSpot = response.lineBarSpots![0];
+                setState(() {
+                  _touchedX = touchedSpot.x;
+                });
+              } else {
+                setState(() {
+                  _touchedX = null;
+                });
+              }
+            },
+          ),
+          // Custom vertical line for touch position
+          extraLinesData: ExtraLinesData(horizontalLines: [], verticalLines: [
+            if (_touchedX != null)
+              VerticalLine(
+                x: _touchedX!,
+                color: Colors.grey,
+                strokeWidth: 1,
+                dashArray: [5, 5],
+              ),
+          ]),
         ),
       ),
     );
