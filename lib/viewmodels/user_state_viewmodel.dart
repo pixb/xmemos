@@ -46,7 +46,7 @@ class UserStateViewModel extends ChangeNotifier {
   }
 
     // 模拟登录逻辑  
-  Future<ApiResult<User>> loginMemosWithAccessToken(String hostUrl, String token) async {  
+  Future<ApiResult<User>> loginMonitorWithAccessToken(String hostUrl, String token) async {  
     try {  
       // 模拟网络延迟  
       await Future.delayed(const Duration(seconds: 1));  

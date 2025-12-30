@@ -7,7 +7,7 @@ import '../common/api_result.dart';
 
 // 对应 RouteName 常量
 class RouteName {
-  static const String MEMOS = '/';
+  static const String HOME = '/';
   // ... 其他路由
 }
 
@@ -66,15 +66,15 @@ class _LoginPageState extends State<LoginPage> {
     // 3. 调用 ViewModel
     final userViewModel = context.read<UserStateViewModel>();
     // 显示 Loading (可选，这里略过，直接 await)
-    final result = await userViewModel.loginMemosWithAccessToken(finalHost, tokenText);
+    final result = await userViewModel.loginMonitorWithAccessToken(finalHost, tokenText);
 
     // 4. 处理结果 (对应 suspendOnSuccess / suspendOnErrorMessage)
     if (!mounted) return;
 
     result.onSuccess((data) {
-      // 导航逻辑：清空栈并跳转到 MEMOS
+      // 导航逻辑：清空栈并跳转到 HOME
       // GoRouter 的 go() 方法天然就是替换栈的逻辑 (类似 popUpTo inclusive)
-      context.go(RouteName.MEMOS);
+      context.go(RouteName.HOME);
     });
 
     result.onError((message) {
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
     final isUserLoggedIn = userViewModel.currentUser != null;
 
     // 对应 R.string
-    final title = isUserLoggedIn ? "Add Account" : "Moe Memos";
+    final title = isUserLoggedIn ? "Add Account" : "MonitorX";
     const infoText = "### Input Login Information\n\nPlease enter your server address and access token."; // 模拟 Markdown
 
     return Scaffold(

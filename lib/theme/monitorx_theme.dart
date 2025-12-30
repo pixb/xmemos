@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';  
-  
-class MoeMemosTheme {  
+
+class MonitorXTheme {  
   // 1. 定义核心颜色 (种子颜色)  
   // 你可以根据你的 App 品牌色修改这里  
   static const Color _seedColor = Color(0xFF6750A4); // 比如紫色系  
-  
+
   // 2. 亮色模式 (Light Theme) 配置  
   static ThemeData get light {  
     return ThemeData(  
@@ -24,7 +24,7 @@ class MoeMemosTheme {
         backgroundColor: Colors.transparent, // 透明背景  
         foregroundColor: Colors.black,       // 文字颜色  
       ),  
-  
+
       // 自定义 FloatingActionButton 样式  
       floatingActionButtonTheme: FloatingActionButtonThemeData(  
         backgroundColor: _seedColor,  
@@ -32,7 +32,7 @@ class MoeMemosTheme {
         elevation: 4,  
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),  
       ),  
-  
+
       // 自定义卡片样式  
       cardTheme: CardThemeData(
         elevation: 2,  
@@ -48,7 +48,7 @@ class MoeMemosTheme {
       ),  
     );  
   }  
-  
+
   // 3. 暗色模式 (Dark Theme) 配置  
   static ThemeData get dark {  
     return ThemeData(  
@@ -58,14 +58,14 @@ class MoeMemosTheme {
         brightness: Brightness.dark, // 关键点：设置为暗色  
         // surface: const Color(0xFF121212), // 比如纯黑背景  
       ),  
-  
+
       appBarTheme: const AppBarTheme(  
         centerTitle: true,  
         elevation: 0,  
         backgroundColor: Colors.transparent,  
         foregroundColor: Colors.white,  
       ),  
-  
+
       floatingActionButtonTheme: FloatingActionButtonThemeData(  
         backgroundColor: _seedColor.withOpacity(0.8), // 暗色模式下稍微柔和一点  
         foregroundColor: Colors.white,  

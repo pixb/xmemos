@@ -1,6 +1,6 @@
 {
-    "name": "xmemos",
-    "short_name": "xmemos",
+    "name": "monitorx",
+    "short_name": "monitorx",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

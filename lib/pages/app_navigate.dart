@@ -7,14 +7,14 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 
-import '../theme/moe_memos_theme.dart';
+import '../theme/monitorx_theme.dart';
 import '../viewmodels/user_state_viewmodel.dart';
 import 'login_page.dart';
 import 'home_page.dart';
 
 // 对应 RouteName object  
 class RouteName {  
-  static const String MEMOS = '/';  
+  static const String HOME = '/';  
   static const String SETTINGS = '/settings';  
   static const String LOGIN = '/login';  
   static const String INPUT = '/input';  
@@ -25,15 +25,15 @@ class RouteName {
   static const String SEARCH = '/search';  
 }
 
-class MoeMemosApp extends StatefulWidget {  
-  const MoeMemosApp({super.key});  
-  
+class MonitorXApp extends StatefulWidget {  
+  const MonitorXApp({super.key});  
+
   @override  
-  State<MoeMemosApp> createState() => _MoeMemosAppState();  
+  State<MonitorXApp> createState() => _MonitorXAppState();  
 } 
 
 // app widget state
-class _MoeMemosAppState extends State<MoeMemosApp> {  
+class _MonitorXAppState extends State<MonitorXApp> {  
   StreamSubscription? _sub;  
   
   @override  
@@ -72,7 +72,7 @@ class _MoeMemosAppState extends State<MoeMemosApp> {
   
   // 路由配置 (对应 NavHost)  
   final GoRouter _router = GoRouter(  
-    initialLocation: RouteName.MEMOS,  
+    initialLocation: RouteName.HOME,  
     redirect: (BuildContext context, GoRouterState state) async {  
        // 对应 LaunchedEffect 中的 suspendOnNotLogin 逻辑  
        final userState = Provider.of<UserStateViewModel>(context, listen: false);  
@@ -87,7 +87,7 @@ class _MoeMemosAppState extends State<MoeMemosApp> {
     routes: [
       // 1. HomePage (Start Destination)
       GoRoute(
-        path: RouteName.MEMOS,
+        path: RouteName.HOME,
         pageBuilder: (context, state) => _buildPageWithTransition(const HomePage()),
       ),  
         
@@ -178,13 +178,13 @@ class _MoeMemosAppState extends State<MoeMemosApp> {
   
   @override
   Widget build(BuildContext context) {
-    // 对应 MoeMemosTheme
+    // 对应 MonitorXTheme
     return ChangeNotifierProvider(
       create: (_) => UserStateViewModel(),
       child: MaterialApp.router(
-        title: 'Moe Memos',
-        theme: MoeMemosTheme.light, // 你需要自定义的主题
-        darkTheme: MoeMemosTheme.dark,
+        title: 'MonitorX',
+        theme: MonitorXTheme.light, // 你需要自定义的主题
+        darkTheme: MonitorXTheme.dark,
         routerConfig: _router,
         // 对应 Modifier.background(MaterialTheme.colorScheme.surface)
         // 在 Flutter 中通常由 Scaffold 的 backgroundColor 决定

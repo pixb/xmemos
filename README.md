@@ -1,6 +1,6 @@
-# xmemos
+# monitorx
 
-A new Flutter project of memos.
+A new Flutter project for monitoring application.
 
 ## Getting Started
 
